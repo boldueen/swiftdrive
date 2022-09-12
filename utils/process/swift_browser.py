@@ -12,9 +12,12 @@ from halo import Halo
 
 
 
-def download_report_file():
+def download_report_file(start_date:str, end_date:str):
+    """
+    start_date example: '2022-03-23'
+    """
     opts = FirefoxOptions()
-    opts.add_argument("--headless")
+    # opts.add_argument("--headless")
 
     delete_file(FILEPATH)
 
@@ -33,11 +36,10 @@ def download_report_file():
     spinner.stop()
     spinner.info("url open!")
 
-    
-
     time.sleep(2)
 
-    
+    spinner = Halo(text='authorizing', spinner='dots')
+    spinner.start()
 
     email = driver.find_element(By.XPATH, "/html/body/div/div/div[1]/div/div/div[2]/form/fieldset/div[1]/div/div/input")
 
@@ -50,14 +52,33 @@ def download_report_file():
     button = driver.find_element(By.XPATH, '//*[@id="app-site"]/div/div[1]/div/div/div[2]/form/fieldset/div[3]/button')
     button.click()
 
+    spinner.stop()
+    spinner.info("authorizing complete")
+
     driver.get('https://swiftdrive.ru/app/customers-reports')
     time.sleep(1)
+
+    driver.find_element(By.XPATH, '//*[contains(text(), "Диапазон")]').click()
+
+
+
+
+
+    start_date_webelement = driver.find_element(By.XPATH, '/html/body/div[2]/div[3]/div/div[2]/div[1]/div/div/input')
+    start_date_webelement.send_keys(start_date)
+
+    end_date_webelement = driver.find_element(By.XPATH, '/html/body/div[2]/div[3]/div/div[2]/div[2]/div/div/input')
+    end_date_webelement.send_keys(end_date)
+
+    driver.find_element(By.XPATH, '//*[contains(text(), "Применить")]').click()
+
+
     driver.find_element(By.XPATH, '//*[contains(text(), "Экспорт")]').click()
     driver.find_element(By.XPATH, '//*[contains(text(), "Экспортировать")]').click()
 
     while True:
         if os.path.isfile(FILEPATH):
-            print('file successfully downloaded')
+            print('...file successfully downloaded...')
             break
 
     time.sleep(1)
