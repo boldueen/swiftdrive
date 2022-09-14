@@ -17,7 +17,7 @@ def download_report_file(start_date:str, end_date:str):
     start_date example: '2022-03-23'
     """
     opts = FirefoxOptions()
-    # opts.add_argument("--headless")
+    opts.add_argument("--headless")
 
     delete_file(FILEPATH)
 
@@ -62,7 +62,8 @@ def download_report_file(start_date:str, end_date:str):
 
 
 
-
+    spinner = Halo(text='downloadinf file', spinner='simpeDots')
+    spinner.start()
 
     start_date_webelement = driver.find_element(By.XPATH, '/html/body/div[2]/div[3]/div/div[2]/div[1]/div/div/input')
     start_date_webelement.send_keys(start_date)
@@ -78,12 +79,13 @@ def download_report_file(start_date:str, end_date:str):
 
     while True:
         if os.path.isfile(FILEPATH):
-            print('...file successfully downloaded...')
             break
 
     time.sleep(1)
 
     driver.quit()
+    spinner.stop()
+    spinner.info("file successfully downloaded")
 
     return True
 
