@@ -14,17 +14,7 @@ opts.add_argument("--headless")
 driver = webdriver.Firefox(executable_path = './utils/geckodriver', options=opts)
 
 driver.get("http://www.python.org")
-
-
-
-titles = driver.find_elements(By.TAG_NAME, 'a')
-
-for title in titles:
-    print(title.text)
-
 driver.quit()
-
-
 
 
 print('_____finish____programm____')
