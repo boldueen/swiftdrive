@@ -3,27 +3,34 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 from selenium.webdriver import FirefoxOptions, FirefoxProfile
 from selenium.webdriver.firefox.options import Options
-from settings import PASSWORD, DOWNLOAD_PATH, LOGIN, FILEPATH, PWD
+from settings import PASSWORD, DOWNLOAD_PATH, LOGIN, FILEPATH, PWD, BASE_DOWNLOAD_PATH, PROJ_DOWNLOAD_PATH, FILENAME
 import time
 import os
 from halo import Halo
 
 
-
-
-
-def download_report_file(start_date:str, end_date:str):
+def download_report_file(start_date:str, end_date:str, base_or_proj:str):
     """
     start_date example: '2022-03-23'
     """
+    download_path=''
+    if base_or_proj == 'PROJ':
+        download_path = PROJ_DOWNLOAD_PATH
+    elif base_or_proj == 'BASE':
+        download_path = BASE_DOWNLOAD_PATH
+    else:
+        print("INPUT BASE OR PROJ PLZ")
+        return
+
+
     opts = FirefoxOptions()
     opts.add_argument("--headless")
 
-    delete_file(FILEPATH)
+    delete_file(download_path+FILENAME)
 
     opts.set_preference("browser.download.folderList", 2)
     opts.set_preference("browser.download.manager.showWhenStarting", False)
-    opts.set_preference("browser.download.dir", DOWNLOAD_PATH)
+    opts.set_preference("browser.download.dir", download_path)
     opts.set_preference("browser.helperApps.neverAsk.saveToDisk", "application/x-gzip")
 
 
@@ -62,7 +69,7 @@ def download_report_file(start_date:str, end_date:str):
 
 
 
-    spinner = Halo(text='downloadinf file', spinner='simpeDots')
+    spinner = Halo(text='downloading file', spinner='simpeDots')
     spinner.start()
 
     start_date_webelement = driver.find_element(By.XPATH, '/html/body/div[2]/div[3]/div/div[2]/div[1]/div/div/input')
@@ -78,7 +85,7 @@ def download_report_file(start_date:str, end_date:str):
     driver.find_element(By.XPATH, '//*[contains(text(), "Экспортировать")]').click()
 
     while True:
-        if os.path.isfile(FILEPATH):
+        if os.path.isfile(download_path+FILENAME):
             break
 
     time.sleep(1)

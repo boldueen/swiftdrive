@@ -11,6 +11,9 @@ PASSWORD = os.environ.get("PASSWORD")
 
 DOWNLOAD_PATH  = os.environ.get("PWD") + os.environ.get("DOWNLOAD_PATH")
 FILEPATH = os.environ.get("PWD") + os.environ.get("DOWNLOAD_PATH") + os.environ.get("FILENAME")
+BASE_DOWNLOAD_PATH = DOWNLOAD_PATH + os.environ.get("BASE") 
+PROJ_DOWNLOAD_PATH = DOWNLOAD_PATH + os.environ.get("PROJ") 
+FILENAME = os.environ.get("FILENAME")
 
 MAIL_EMAIL=os.environ.get("MAIL_EMAIL")
 MAIL_PASS=os.environ.get("MAIL_PASS")
