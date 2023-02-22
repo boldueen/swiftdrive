@@ -20,16 +20,6 @@ fake_db={
         'target_rides':607
     },
 
-    'Бутова Светлана':{
-        'target_gp':629764,
-        'target_rides':3817
-    },
-
-    'Осипова Елена':{
-        'target_gp':123915,
-        'target_rides':751
-    },
-
     'Кузнецов Дмитрий':{
         'target_gp':78029,
         'target_rides':473
@@ -43,6 +33,16 @@ fake_db={
     'Шевцов Максим':{
         'target_gp':196070,
         'target_rides':1188
+    },
+
+    'Бутова Светлана':{
+        'target_gp':629764,
+        'target_rides':3817
+    },
+
+    'Осипова Елена':{
+        'target_gp':123915,
+        'target_rides':751
     },
 
 }
@@ -144,9 +144,12 @@ def set_info_to_csv_by_manager_id(csv_path:str, id:int, rides_as_unit_of_ratio=0
 
 
 def create_daily_report_from_file(
+    start_date: str,
+    end_date: str,
     filepath:str='reports/daily_report.xlsx', 
     data_filepath:str='downloads/base/CustomersReports.xlsx', 
-    data_for_projection:str='downloads/projection/CustomersReports.xlsx'
+    data_for_projection:str='downloads/projection/CustomersReports.xlsx',
+
         ):
 
     wb_daily = Workbook()
@@ -154,7 +157,8 @@ def create_daily_report_from_file(
     wb_daily.guess_type = True
 
     ws_daily = wb_daily.active
-    today = datetime.now()
+    today = datetime.strptime(end_date, '%Y-%m-%d')
+    print(today)
     yesterday = today - timedelta(1)
 
     ws_daily.append([
@@ -193,17 +197,18 @@ def create_daily_report_from_file(
         all_ds = proj_df[proj_df['Менеджер'] == manager].sum(numeric_only=True)
         yesterday_ds = df[df['Менеджер'] == manager].sum(numeric_only=True)
 
-        print(manager,'\n',all_ds[[2,4,5,7,8,9]])
-        print(manager,'\n',yesterday_ds[[2,4,5,7,8,9]])
+        # print(manager,'\n',all_ds[[2,4,5,7,8,9]])
+        # print(manager,'\n',yesterday_ds[[2,4,5,7,8,9]])
 
         yesterday_rides = yesterday_ds[2]
         all_fact_rides = all_ds[2] 
         
-        GMV = yesterday_ds[4]
+        # GMV = yesterday_ds[4]
+        GMV = all_ds[4]
         target_rides = target.get('target_rides')
         fact_vs_target_rides = (all_fact_rides/target_rides)
 
-        print(manager, all_fact_rides, target_rides, fact_vs_target_rides)
+        # print(manager, all_fact_rides, target_rides, fact_vs_target_rides)
 
         customers_with_access_to_personal_account = yesterday_ds[7]
         FTR_users = yesterday_ds[8]
@@ -212,7 +217,7 @@ def create_daily_report_from_file(
 
         margin_GP = all_ds[5]
         GP_per_ride = round(margin_GP/all_fact_rides,2)
-        GP_client_check = margin_GP/GMV
+        GP_client_check = round(GP_per_ride/(GMV/all_fact_rides),2)
 
         target_gp = target.get('target_gp')
 
@@ -232,26 +237,26 @@ def create_daily_report_from_file(
 
             if date_of_first_ride.month == today.month:
                 new_companies_rides+=rides_value
-                print(manager, date_of_first_ride.month, today.month, )
 
         # projection
         days_counter = [0] * 7
-        last_day_of_month = calendar.monthrange(datetime.now().year, datetime.now().month)[1]+1
+        # last_day_of_month = calendar.monthrange(datetime.now().year, datetime.now().month)[1]+1
+        last_day_of_month = calendar.monthrange(today.year, today.month)[1]+1
         ratio = round(all_fact_rides/(today.day-1), 2)
         summary_coef = 0
 
         for i in range(today.day, last_day_of_month):
-            weekday = calendar.weekday(datetime.now().year, datetime.now().month, i)
+            weekday = calendar.weekday(today.year, today.month, i)
             days_counter[weekday] += 1
             summary_coef += koefs[weekday]
 
         projection_rides = int((ratio*summary_coef)+all_fact_rides)
-        fact_vs_projection_rides=all_fact_rides/projection_rides
+        # fact_vs_projection_rides=all_fact_rides/projection_rides
         projection_gp = projection_rides * GP_per_ride
         projection_vs_target_gp = projection_gp/target_gp
         fact_vs_target_gp = round(margin_GP/target_gp,2)
         projection_vs_target_rides = round(projection_rides/target_rides,2)
-        print(manager, all_fact_rides, projection_rides, fact_vs_projection_rides)
+        
         row = [
             manager,
             yesterday_rides,
@@ -293,10 +298,12 @@ def create_daily_report_from_file(
                 continue
         ws_daily.cell(row=row, column=j).value = total
 
-
+    # GP_client_check_total = round(int(ws_daily.cell(row=row, column=14).value)/((int(ws_daily.cell(row=row, column=9).value)/int(ws_daily.cell(row=row, column=3).value))),2)
+    # GP_client_check = round(GP_per_ride/(GMV/all_fact_rides),2)
     ws_daily.cell(row=row, column=7).value = float(int(ws_daily.cell(row=row, column=3).value)/int(ws_daily.cell(row=row, column=6).value))
     ws_daily.cell(row=row, column=8).value = float(int(ws_daily.cell(row=row, column=4).value)/int(ws_daily.cell(row=row, column=6).value))
     ws_daily.cell(row=row, column=14).value = int(int(ws_daily.cell(row=row, column=13).value)/int(ws_daily.cell(row=row, column=3).value))
+    ws_daily.cell(row=row, column=15).value = float(int(ws_daily.cell(row=row, column=14).value)/(int(ws_daily.cell(row=row, column=9).value)/int(ws_daily.cell(row=row, column=3).value)))
     ws_daily.cell(row=row, column=18).value = float(int(ws_daily.cell(row=row, column=13).value)/int(ws_daily.cell(row=row, column=17).value))
     ws_daily.cell(row=row, column=19).value = float(int(ws_daily.cell(row=row, column=16).value)/int(ws_daily.cell(row=row, column=17).value))
 
@@ -310,6 +317,9 @@ def create_daily_report_from_file(
 
     for cell in ws_daily['G']:
         cell.number_format = '0.00%'
+
+    for cell in ws_daily['O']:
+        cell.number_format = '0.00%'
     
     for cell in ws_daily['R']:
         cell.number_format = '0.00%'
@@ -319,7 +329,6 @@ def create_daily_report_from_file(
 
     for cell in ws_daily['H']:
         cell.number_format = '0.00%'
-
 
     for cell in ws_daily['C']:
         cell.number_format = '### ### ##0'
@@ -342,11 +351,6 @@ def create_daily_report_from_file(
     # for cell in ws_daily['M']:
     #     cell.number_format = '0'
 
-
-
-
-
- 
 
     # font, styles and width
     ws_daily.column_dimensions['A'].width = '20'
@@ -401,23 +405,4 @@ def create_daily_report_from_file(
         
 
     wb_daily.save(filepath)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-
 
