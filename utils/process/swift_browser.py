@@ -63,17 +63,25 @@ def download_report_file(start_date:str, end_date:str, base_or_proj:str):
     spinner.info("authorizing complete")
 
     driver.get('https://swiftdrive.ru/app/customers-reports')
-    time.sleep(1)
+    time.sleep(3)
+
 
     driver.find_element(By.XPATH, '//*[contains(text(), "Диапазон")]').click()
+    # driver.find_element(By.XPATH, '/html/body/div/div/div[1]/div[2]/main/div/div/div/div/div/div/div/div/div[1]/div/button[3]/span[1]/span').click()
+
+    time.sleep(1)
 
 
 
     spinner = Halo(text='downloading file', spinner='simpeDots')
     spinner.start()
 
-    start_date_webelement = driver.find_element(By.XPATH, '/html/body/div[2]/div[3]/div/div[2]/div[1]/div/div/input')
+    # start_date_webelement = driver.find_element(By.XPATH, '/html/body/div[2]/div[3]/div/div[2]/div[1]/div/div/input')
+    start_date_webelement = driver.find_element(By.XPATH, '//*[@id="body"]/div[2]/div[3]/div/div[2]/div[1]/div/div/input')
+
     start_date_webelement.send_keys(start_date)
+
+    driver.save_screenshot('screenie.png')
 
     end_date_webelement = driver.find_element(By.XPATH, '/html/body/div[2]/div[3]/div/div[2]/div[2]/div/div/input')
     end_date_webelement.send_keys(end_date)

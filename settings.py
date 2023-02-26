@@ -15,6 +15,8 @@ BASE_DOWNLOAD_PATH = DOWNLOAD_PATH + os.environ.get("BASE")
 PROJ_DOWNLOAD_PATH = DOWNLOAD_PATH + os.environ.get("PROJ") 
 FILENAME = os.environ.get("FILENAME")
 
+REPORT_FILEPATH = 'utils/process/reports/' + 'daily_report.xlsx'
+
 MAIL_EMAIL=os.environ.get("MAIL_EMAIL")
 MAIL_PASS=os.environ.get("MAIL_PASS")
 

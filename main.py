@@ -3,7 +3,7 @@ from utils.process.swift_browser import download_report_file
 
 from utils.process.mail_worker import send_daily_report_on_mail
 
-from settings import FILEPATH
+from settings import FILEPATH, REPORT_FILEPATH
 
 import time
 import schedule    
@@ -20,15 +20,15 @@ def main():
     day_before_yesterday = yesterday - timedelta(days=1)
     first_day_of_month = yesterday.replace(day=1)
 
-    download_report_file(start_date=day_before_yesterday, end_date=yesterday, base_or_proj='BASE')
-    download_report_file(start_date=first_day_of_month, end_date=yesterday, base_or_proj='PROJ')
+    # download_report_file(start_date=str(day_before_yesterday), end_date=str(yesterday), base_or_proj='BASE')
+    # download_report_file(start_date=str(first_day_of_month), end_date=str(yesterday), base_or_proj='PROJ')
     create_daily_report_from_file(
         filepath='utils/process/reports/daily_report.xlsx', 
-        start_date=first_day_of_month, 
-        end_date=yesterday
+        start_date=str(first_day_of_month), 
+        end_date=str(yesterday)
         )
 
-    send_daily_report_on_mail('nikon2283@gmail.com', 'Иван', FILEPATH, 'daily.xlsx')
+    send_daily_report_on_mail('nikon2283@gmail.com', 'Иван', REPORT_FILEPATH, 'daily.xlsx')
 
     print('_____finish____programm____')
     print('work_time:', round(time.time()-start, 2), 'seconds')
