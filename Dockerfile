@@ -1,9 +1,8 @@
-FROM python:3.11
-
-COPY . /code
-
-RUN chmod +x code/utils/geckodriver
-  
-RUN pip install -r code/requirements.txt
-RUN code/main.py
+FROM python:3.10
+WORKDIR /code
+COPY . .
+RUN chmod +x utils/geckodriver
+RUN chmod +x main.py
+RUN pip install -r requirements.txt
+CMD ["python3.10", "main.py"]
 
