@@ -1,2 +1,5 @@
 # swiftdrive daily report
-sudo chmod +x utils/geckodriver
+
+```bash
+sudo docker-compose up --build
+```
